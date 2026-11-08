@@ -4,7 +4,21 @@ import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'update_page.dart';
 
-void main() => runApp(const StudyMateApp());
+final ValueNotifier<ThemeMode> appThemeMode = ValueNotifier<ThemeMode>(ThemeMode.light);
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final prefs = await SharedPreferences.getInstance();
+  appThemeMode.value = prefs.getBool('dark_theme') == true ? ThemeMode.dark : ThemeMode.light;
+  runApp(const StudyMateApp());
+}
+
+Future<void> toggleAppTheme() async {
+  final dark = appThemeMode.value != ThemeMode.dark;
+  appThemeMode.value = dark ? ThemeMode.dark : ThemeMode.light;
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setBool('dark_theme', dark);
+}
 
 const ink = Color(0xFF17152B);
 const purple = Color(0xFF7057E8);
@@ -13,11 +27,16 @@ const pale = Color(0xFFF4F1FF);
 class StudyMateApp extends StatelessWidget {
   const StudyMateApp({super.key});
   @override
-  Widget build(BuildContext context) => MaterialApp(
-    debugShowCheckedModeBanner: false,
-    title: 'StudyMate',
-    theme: ThemeData(useMaterial3: true, scaffoldBackgroundColor: const Color(0xFFF8F8FC), colorScheme: ColorScheme.fromSeed(seedColor: purple)),
-    home: const HomePage(),
+  Widget build(BuildContext context) => ValueListenableBuilder<ThemeMode>(
+    valueListenable: appThemeMode,
+    builder: (context, mode, _) => MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'StudyMate',
+      themeMode: mode,
+      theme: ThemeData(useMaterial3: true, scaffoldBackgroundColor: const Color(0xFFF8F8FC), colorScheme: ColorScheme.fromSeed(seedColor: purple)),
+      darkTheme: ThemeData(useMaterial3: true, brightness: Brightness.dark, scaffoldBackgroundColor: const Color(0xFF10101B), colorScheme: ColorScheme.fromSeed(seedColor: purple, brightness: Brightness.dark), cardColor: const Color(0xFF1D1B2B), appBarTheme: const AppBarTheme(backgroundColor: Color(0xFF10101B), foregroundColor: Colors.white), navigationBarTheme: const NavigationBarThemeData(backgroundColor: Color(0xFF191727), indicatorColor: Color(0xFF493A7C))),
+      home: const HomePage(),
+    ),
   );
 }
 
@@ -48,6 +67,7 @@ class _HomePageState extends State<HomePage> {
       Container(height: 46, width: 46, decoration: BoxDecoration(color: pale, borderRadius: BorderRadius.circular(15)), child: const Icon(Icons.school_rounded, color: purple, size: 27)),
       const SizedBox(width: 12),
       const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('StudyMate', style: TextStyle(fontSize: 21, fontWeight: FontWeight.w800, color: ink)), Text('শেখা হোক আরও সহজ', style: TextStyle(color: Colors.black54, fontSize: 12))])),
+      IconButton(tooltip: appThemeMode.value == ThemeMode.dark ? 'Light theme' : 'Dark theme', onPressed: toggleAppTheme, icon: Icon(appThemeMode.value == ThemeMode.dark ? Icons.light_mode_rounded : Icons.dark_mode_rounded)),
       IconButton(tooltip: 'নিরাপদ আপডেট', onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const UpdatePage())), icon: const Icon(Icons.system_update_alt_rounded)),
     ]),
     const SizedBox(height: 24),
