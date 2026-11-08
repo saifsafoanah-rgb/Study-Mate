@@ -54,7 +54,7 @@ class _UpdatePageState extends State<UpdatePage> {
       setState(() {
         latestBuild = build;
         latestVersion = tag;
-        releaseUrl = latest['html_url']?.toString();
+        releaseUrl = latest?['html_url']?.toString();
         checksum = hash;
       });
     } catch (e) {
