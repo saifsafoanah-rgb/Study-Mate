@@ -66,7 +66,7 @@ class _HomePageState extends State<HomePage> {
     Row(children: [
       Container(height: 46, width: 46, decoration: BoxDecoration(color: pale, borderRadius: BorderRadius.circular(15)), child: const Icon(Icons.school_rounded, color: purple, size: 27)),
       const SizedBox(width: 12),
-      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('StudyMate', style: TextStyle(fontSize: 21, fontWeight: FontWeight.w800, color: Theme.of(context).colorScheme.onSurface)), Text('শেখা হোক আরও সহজ', style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 12))])),
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('StudyMate', style: TextStyle(fontSize: 21, fontWeight: FontWeight.w800, color: Theme.of(context).colorScheme.onSurface)), Text('শেখা হোক আরও সহজ', style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 12))])),
       IconButton(tooltip: appThemeMode.value == ThemeMode.dark ? 'Light theme' : 'Dark theme', onPressed: toggleAppTheme, icon: Icon(appThemeMode.value == ThemeMode.dark ? Icons.light_mode_rounded : Icons.dark_mode_rounded)),
       IconButton(tooltip: 'নিরাপদ আপডেট', onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const UpdatePage())), icon: const Icon(Icons.system_update_alt_rounded)),
     ]),
