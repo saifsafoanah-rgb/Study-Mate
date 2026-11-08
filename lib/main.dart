@@ -450,9 +450,9 @@ class StudyProgress {
   static Future<void> awardQuiz() async {
     final prefs = await SharedPreferences.getInstance();
     final today = DateTime.now();
-    final todayKey = '\${today.year}-\${today.month}-\${today.day}';
+    final todayKey = '${today.year}-${today.month}-${today.day}';
     final yesterday = today.subtract(const Duration(days: 1));
-    final yesterdayKey = '\${yesterday.year}-\${yesterday.month}-\${yesterday.day}';
+    final yesterdayKey = '${yesterday.year}-${yesterday.month}-${yesterday.day}';
     final lastDay = prefs.getString('progress_last_day') ?? '';
     var streak = prefs.getInt('progress_streak') ?? 0;
     if (lastDay != todayKey) {
@@ -488,21 +488,21 @@ class ProgressPage extends StatelessWidget {
           Container(padding: const EdgeInsets.all(20), decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF7660EA), Color(0xFF4E3CB8)]), borderRadius: BorderRadius.circular(22)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             const Text('চালিয়ে যাও, তুমি পারবে!', style: TextStyle(color: Colors.white70)),
             const SizedBox(height: 8),
-            Text('\${data['xp']} XP', style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w800)),
+            Text("${data['xp']} XP", style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w800)),
             const Text('কুইজ শেষ করলে ১০ XP পাবে', style: TextStyle(color: Colors.white70)),
           ])),
           const SizedBox(height: 16),
           Row(children: [
-            Expanded(child: _ProgressStat(icon: Icons.local_fire_department_rounded, value: '\${data['streak']}', label: 'দিনের Streak', color: Colors.deepOrange)),
+            Expanded(child: _ProgressStat(icon: Icons.local_fire_department_rounded, value: "${data['streak']}", label: 'দিনের Streak', color: Colors.deepOrange)),
             const SizedBox(width: 10),
-            Expanded(child: _ProgressStat(icon: Icons.quiz_rounded, value: '\${data['quizzes']}', label: 'কুইজ শেষ', color: purple)),
+            Expanded(child: _ProgressStat(icon: Icons.quiz_rounded, value: "${data['quizzes']}", label: 'কুইজ শেষ', color: purple)),
           ]),
           const SizedBox(height: 22),
           const Text('🏆 Leaderboard (ডেমো)', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           _rankRow('১', 'Study Star', '120 XP'),
           _rankRow('২', 'Quiz Master', '90 XP'),
-          _rankRow('৩', 'তুমি', '\${data['xp']} XP'),
+          _rankRow('৩', 'তুমি', "${data['xp']} XP"),
           const SizedBox(height: 10),
           const Text('নোট: XP ও Streak এই ডিভাইসে সেভ হয়। Leaderboard আপাতত নমুনা; অন্য শিক্ষার্থীদের লাইভ র‍্যাঙ্ক দেখাতে অনলাইন ডাটাবেস ও অ্যাকাউন্ট লাগবে।', style: TextStyle(color: Colors.black54, fontSize: 12, height: 1.5)),
         ]);
