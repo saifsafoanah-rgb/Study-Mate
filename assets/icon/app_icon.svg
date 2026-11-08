@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+<defs>
+ <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#32105f"/><stop offset="1" stop-color="#09051c"/></linearGradient>
+ <linearGradient id="purple" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e0b6ff"/><stop offset=".5" stop-color="#a64cff"/><stop offset="1" stop-color="#5413b8"/></linearGradient>
+ <linearGradient id="white" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff"/><stop offset="1" stop-color="#b9a9dc"/></linearGradient>
+ <filter id="glow"><feGaussianBlur stdDeviation="16" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<rect width="1024" height="1024" rx="220" fill="url(#bg)"/>
+<rect x="52" y="52" width="920" height="920" rx="190" fill="none" stroke="#a64cff" stroke-width="12" filter="url(#glow)"/>
+<path d="M180 670h664v115H180z" fill="#170b31" stroke="#7b35d0" stroke-width="8"/>
+<path d="M210 635h250v55H210zM210 565h250v55H210z" fill="#4b2380" stroke="#b778ff" stroke-width="8"/>
+<path d="M270 520l-40-110 90 60 25 60M345 520l18-105 54 75-20 48" fill="#55b96b" stroke="#a5f28e" stroke-width="8"/>
+<path d="M725 370l60-140 65 140" fill="#3b1a68" stroke="#b77cff" stroke-width="14"/>
+<path d="M700 370h180l-25 48H725z" fill="#d6b5ff"/>
+<path d="M350 285l160-95 165 95-165 90z" fill="#35115f" stroke="#d3a5ff" stroke-width="12"/>
+<path d="M510 195v-52" stroke="#ffc65c" stroke-width="18" stroke-linecap="round"/>
+<path d="M510 143l-75 42" stroke="#ffc65c" stroke-width="18" stroke-linecap="round"/>
+<rect x="320" y="300" width="385" height="340" rx="125" fill="url(#white)" stroke="#e8d8ff" stroke-width="12"/>
+<rect x="365" y="380" width="300" height="185" rx="78" fill="#160a2d" stroke="#8e39ed" stroke-width="12"/>
+<path d="M430 470q35-65 75 0M555 470q35-65 75 0" fill="none" stroke="#c78aff" stroke-width="26" stroke-linecap="round"/>
+<circle cx="340" cy="450" r="60" fill="url(#purple)" stroke="#e4caff" stroke-width="14"/>
+<circle cx="685" cy="450" r="60" fill="url(#purple)" stroke="#e4caff" stroke-width="14"/>
+<path d="M420 600q-75 35-85 120l120 40 60-100zM605 600q75 35 85 120l-120 40-60-100z" fill="url(#white)" stroke="#a879e8" stroke-width="12"/>
+<path d="M400 655q110-85 220 0v170q-110-70-220 0z" fill="#4a1590" stroke="#e3caff" stroke-width="14"/>
+<path d="M510 655v170" stroke="#f8eaff" stroke-width="12"/>
+<path d="M400 655q110-55 220 0" fill="none" stroke="#fff" stroke-width="16"/>
+<text x="512" y="915" text-anchor="middle" font-family="Arial,sans-serif" font-size="92" font-weight="bold" fill="#fff">StudyMate</text>
+</svg>
