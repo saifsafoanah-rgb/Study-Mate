@@ -310,13 +310,14 @@ class GuideAvatar extends StatelessWidget {
   const GuideAvatar({super.key, required this.guide, this.size = 76});
   @override
   Widget build(BuildContext context) => Container(width: size, height: size, decoration: BoxDecoration(
-    gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [guide.color.withOpacity(.65), guide.color]),
+    gradient: RadialGradient(center: const Alignment(-.55, -.65), radius: 1.25, colors: [Color.lerp(guide.color, Colors.white, .62)!, guide.color, Color.lerp(guide.color, Colors.black, .22)!]),
     borderRadius: BorderRadius.circular(size * .34),
-    boxShadow: [BoxShadow(color: guide.color.withOpacity(.25), blurRadius: 12, offset: const Offset(0, 5))],
+    boxShadow: [BoxShadow(color: guide.color.withOpacity(.32), blurRadius: 16, offset: const Offset(0, 7)), const BoxShadow(color: Colors.white, blurRadius: 1, spreadRadius: 1)],
     border: Border.all(color: Colors.white, width: 2),
   ), child: Stack(alignment: Alignment.center, children: [
-    Icon(Icons.face_rounded, color: Colors.white.withOpacity(.96), size: size * .62),
-    Positioned(bottom: size * .08, right: size * .08, child: Container(width: size * .19, height: size * .19, decoration: BoxDecoration(color: const Color(0xFF8EF0B0), shape: BoxShape.circle, border: Border.all(color: Colors.white, width: 2)))),
+    Positioned(top: size * .07, left: size * .10, child: Container(width: size * .30, height: size * .12, decoration: BoxDecoration(color: Colors.white.withOpacity(.24), borderRadius: BorderRadius.circular(30)))),
+    Icon(Icons.face_rounded, color: Colors.white.withOpacity(.98), size: size * .65, shadows: const [Shadow(color: Colors.black26, blurRadius: 5, offset: Offset(0, 3))]),
+    Positioned(bottom: size * .08, right: size * .08, child: Container(width: size * .19, height: size * .19, decoration: BoxDecoration(color: const Color(0xFF8EF0B0), shape: BoxShape.circle, border: Border.all(color: Colors.white, width: 2), boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4)]))),
   ]));
 }
 
