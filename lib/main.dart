@@ -584,20 +584,64 @@ class BuddiesPage extends StatelessWidget {
   );
 }
 
-class GuideAvatar extends StatelessWidget {
-  final StudyGuide guide; final double size;
+class GuideAvatar extends StatefulWidget {
+  final StudyGuide guide;
+  final double size;
   const GuideAvatar({super.key, required this.guide, this.size = 76});
   @override
-  Widget build(BuildContext context) => Container(width: size, height: size, decoration: BoxDecoration(
-    gradient: RadialGradient(center: const Alignment(-.55, -.65), radius: 1.25, colors: [Color.lerp(guide.color, Colors.white, .62)!, guide.color, Color.lerp(guide.color, Colors.black, .22)!]),
-    borderRadius: BorderRadius.circular(size * .34),
-    boxShadow: [BoxShadow(color: guide.color.withOpacity(.32), blurRadius: 16, offset: const Offset(0, 7)), const BoxShadow(color: Colors.white, blurRadius: 1, spreadRadius: 1)],
-    border: Border.all(color: Colors.white, width: 2),
-  ), child: Stack(alignment: Alignment.center, children: [
-    Positioned(top: size * .07, left: size * .10, child: Container(width: size * .30, height: size * .12, decoration: BoxDecoration(color: Colors.white.withOpacity(.24), borderRadius: BorderRadius.circular(30)))),
-    Icon(Icons.face_rounded, color: Colors.white.withOpacity(.98), size: size * .65, shadows: const [Shadow(color: Colors.black26, blurRadius: 5, offset: Offset(0, 3))]),
-    Positioned(bottom: size * .08, right: size * .08, child: Container(width: size * .19, height: size * .19, decoration: BoxDecoration(color: const Color(0xFF8EF0B0), shape: BoxShape.circle, border: Border.all(color: Colors.white, width: 2), boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4)]))),
-  ]));
+  State<GuideAvatar> createState() => _GuideAvatarState();
+}
+
+class _GuideAvatarState extends State<GuideAvatar> with SingleTickerProviderStateMixin {
+  late final AnimationController _motion = AnimationController(vsync: this, duration: const Duration(milliseconds: 1900))..repeat(reverse: true);
+
+  @override
+  void dispose() {
+    _motion.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final guide = widget.guide;
+    final size = widget.size;
+    return AnimatedBuilder(
+      animation: _motion,
+      builder: (context, child) => Transform(
+        alignment: Alignment.center,
+        transform: Matrix4.identity()
+          ..setEntry(3, 2, 0.001)
+          ..rotateY((_motion.value - .5) * .12)
+          ..translate(0.0, -3.0 * _motion.value, 0.0),
+        child: Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            gradient: RadialGradient(
+              center: const Alignment(-.55, -.65),
+              radius: 1.25,
+              colors: [
+                Color.lerp(guide.color, Colors.white, .62)!,
+                guide.color,
+                Color.lerp(guide.color, Colors.black, .22)!,
+              ],
+            ),
+            borderRadius: BorderRadius.circular(size * .34),
+            boxShadow: [
+              BoxShadow(color: guide.color.withOpacity(.32), blurRadius: 16, offset: Offset(0, 7 + 2 * _motion.value)),
+              const BoxShadow(color: Colors.white, blurRadius: 1, spreadRadius: 1),
+            ],
+            border: Border.all(color: Colors.white, width: 2),
+          ),
+          child: Stack(alignment: Alignment.center, children: [
+            Positioned(top: size * .07, left: size * .10, child: Container(width: size * .30, height: size * .12, decoration: BoxDecoration(color: Colors.white.withOpacity(.24), borderRadius: BorderRadius.circular(30)))),
+            Icon(Icons.face_rounded, color: Colors.white.withOpacity(.98), size: size * .65, shadows: const [Shadow(color: Colors.black26, blurRadius: 5, offset: Offset(0, 3))]),
+            Positioned(bottom: size * .08, right: size * .08, child: Container(width: size * .19, height: size * .19, decoration: BoxDecoration(color: const Color(0xFF8EF0B0), shape: BoxShape.circle, border: Border.all(color: Colors.white, width: 2), boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4)]))),
+          ]),
+        ),
+      ),
+    );
+  }
 }
 
 class GuideChatPage extends StatefulWidget {
