@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() => runApp(const StudyMateApp());
 
@@ -31,7 +32,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    body: SafeArea(child: IndexedStack(index: tab, children: [_home(), const BuddiesPage(), PracticePage(selectedClass: selectedClass), const SimplePage(title: 'নোটস', subtitle: 'তোমার পড়ার নোট এখানে সাজানো থাকবে।', icon: Icons.menu_book_outlined), const SimplePage(title: 'প্রোফাইল', subtitle: 'তোমার শেখার অগ্রগতি এখানে দেখা যাবে।', icon: Icons.person_outline)])),
+    body: SafeArea(child: IndexedStack(index: tab, children: [_home(), const BuddiesPage(), PracticePage(selectedClass: selectedClass), const SimplePage(title: 'নোটস', subtitle: 'তোমার পড়ার নোট এখানে সাজানো থাকবে।', icon: Icons.menu_book_outlined), const ProgressPage()])),
     bottomNavigationBar: NavigationBar(selectedIndex: tab, onDestinationSelected: (v) => setState(() => tab = v), destinations: const [
       NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: 'হোম'),
       NavigationDestination(icon: Icon(Icons.face_retouching_natural), label: 'গাইড'),
@@ -169,6 +170,7 @@ class _PracticePageState extends State<PracticePage> {
       if (selectedOption == current.answer) score++;
       if (questionIndex == questions.length - 1) {
         finished = true;
+        StudyProgress.awardQuiz();
       } else {
         questionIndex++;
         selectedOption = null;
@@ -388,6 +390,7 @@ class _ChapterDetailPageState extends State<ChapterDetailPage> {
       if (selected == question.answer) score++;
       if (index == widget.unit.questions.length - 1) {
         completed = true;
+        StudyProgress.awardQuiz();
       } else {
         index++;
         selected = null;
@@ -439,6 +442,93 @@ class _ChapterDetailPageState extends State<ChapterDetailPage> {
       ],
     ]),
   );
+}
+
+
+
+class StudyProgress {
+  static Future<void> awardQuiz() async {
+    final prefs = await SharedPreferences.getInstance();
+    final today = DateTime.now();
+    final todayKey = '\${today.year}-\${today.month}-\${today.day}';
+    final yesterday = today.subtract(const Duration(days: 1));
+    final yesterdayKey = '\${yesterday.year}-\${yesterday.month}-\${yesterday.day}';
+    final lastDay = prefs.getString('progress_last_day') ?? '';
+    var streak = prefs.getInt('progress_streak') ?? 0;
+    if (lastDay != todayKey) {
+      streak = lastDay == yesterdayKey ? streak + 1 : 1;
+      await prefs.setString('progress_last_day', todayKey);
+      await prefs.setInt('progress_streak', streak);
+    }
+    await prefs.setInt('progress_xp', (prefs.getInt('progress_xp') ?? 0) + 10);
+    await prefs.setInt('progress_quizzes', (prefs.getInt('progress_quizzes') ?? 0) + 1);
+  }
+
+  static Future<Map<String, int>> load() async {
+    final prefs = await SharedPreferences.getInstance();
+    return {
+      'xp': prefs.getInt('progress_xp') ?? 0,
+      'streak': prefs.getInt('progress_streak') ?? 0,
+      'quizzes': prefs.getInt('progress_quizzes') ?? 0,
+    };
+  }
+}
+
+class ProgressPage extends StatelessWidget {
+  const ProgressPage({super.key});
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: const Text('আমার অগ্রগতি', style: TextStyle(fontWeight: FontWeight.bold))),
+    body: FutureBuilder<Map<String, int>>(
+      future: StudyProgress.load(),
+      builder: (context, snapshot) {
+        final data = snapshot.data ?? {'xp': 0, 'streak': 0, 'quizzes': 0};
+        if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
+        return ListView(padding: const EdgeInsets.all(18), children: [
+          Container(padding: const EdgeInsets.all(20), decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF7660EA), Color(0xFF4E3CB8)]), borderRadius: BorderRadius.circular(22)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            const Text('চালিয়ে যাও, তুমি পারবে!', style: TextStyle(color: Colors.white70)),
+            const SizedBox(height: 8),
+            Text('\${data['xp']} XP', style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w800)),
+            const Text('কুইজ শেষ করলে ১০ XP পাবে', style: TextStyle(color: Colors.white70)),
+          ])),
+          const SizedBox(height: 16),
+          Row(children: [
+            Expanded(child: _ProgressStat(icon: Icons.local_fire_department_rounded, value: '\${data['streak']}', label: 'দিনের Streak', color: Colors.deepOrange)),
+            const SizedBox(width: 10),
+            Expanded(child: _ProgressStat(icon: Icons.quiz_rounded, value: '\${data['quizzes']}', label: 'কুইজ শেষ', color: purple)),
+          ]),
+          const SizedBox(height: 22),
+          const Text('🏆 Leaderboard (ডেমো)', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          _rankRow('১', 'Study Star', '120 XP'),
+          _rankRow('২', 'Quiz Master', '90 XP'),
+          _rankRow('৩', 'তুমি', '\${data['xp']} XP'),
+          const SizedBox(height: 10),
+          const Text('নোট: XP ও Streak এই ডিভাইসে সেভ হয়। Leaderboard আপাতত নমুনা; অন্য শিক্ষার্থীদের লাইভ র‍্যাঙ্ক দেখাতে অনলাইন ডাটাবেস ও অ্যাকাউন্ট লাগবে।', style: TextStyle(color: Colors.black54, fontSize: 12, height: 1.5)),
+        ]);
+      },
+    ),
+  );
+
+  static Widget _rankRow(String rank, String name, String xp) => Card(elevation: 0, color: Colors.white, child: ListTile(
+    leading: CircleAvatar(backgroundColor: pale, child: Text(rank, style: const TextStyle(color: purple, fontWeight: FontWeight.bold))),
+    title: Text(name, style: const TextStyle(fontWeight: FontWeight.w600)),
+    trailing: Text(xp, style: const TextStyle(color: purple, fontWeight: FontWeight.bold)),
+  ));
+}
+
+class _ProgressStat extends StatelessWidget {
+  final IconData icon;
+  final String value, label;
+  final Color color;
+  const _ProgressStat({required this.icon, required this.value, required this.label, required this.color});
+  @override
+  Widget build(BuildContext context) => Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(17)), child: Column(children: [
+    Icon(icon, color: color, size: 28),
+    const SizedBox(height: 6),
+    Text(value, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: ink)),
+    Text(label, style: const TextStyle(fontSize: 12, color: Colors.black54)),
+  ]));
 }
 
 
