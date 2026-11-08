@@ -62,14 +62,15 @@ class _HomePageState extends State<HomePage> {
     Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [const Text('বিষয়সমূহ', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: ink)), Text('Class $selectedClass', style: const TextStyle(color: purple, fontWeight: FontWeight.w700))]),
     const SizedBox(height: 12),
     GridView.count(crossAxisCount: 2, shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), mainAxisSpacing: 12, crossAxisSpacing: 12, childAspectRatio: 1.65, children: [
-      SubjectTile(title: 'বাংলা', subtitle: 'ভাষা ও সাহিত্য', icon: Icons.translate, color: Color(0xFFEFF7F1), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => PracticePage(selectedClass: selectedClass, initialSubject: 'বাংলা')))),
-      SubjectTile(title: 'English', subtitle: 'Grammar & Reading', icon: Icons.language, color: Color(0xFFEEF3FF), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => PracticePage(selectedClass: selectedClass, initialSubject: 'English')))),
-      SubjectTile(title: 'গণিত', subtitle: 'অনুশীলন ও সমাধান', icon: Icons.calculate_outlined, color: Color(0xFFFFF4E8), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => PracticePage(selectedClass: selectedClass, initialSubject: 'গণিত')))),
-      SubjectTile(title: 'বিজ্ঞান', subtitle: 'ধারণা ও আবিষ্কার', icon: Icons.science_outlined, color: Color(0xFFF4EEFF), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => PracticePage(selectedClass: selectedClass, initialSubject: 'বিজ্ঞান')))),
+      SubjectTile(title: 'বাংলা', subtitle: 'ভাষা ও সাহিত্য', icon: Icons.translate, color: Color(0xFFEFF7F1), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ChapterLibraryPage(selectedClass: selectedClass, initialSubject: 'বাংলা')))),
+      SubjectTile(title: 'English', subtitle: 'Grammar & Reading', icon: Icons.language, color: Color(0xFFEEF3FF), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ChapterLibraryPage(selectedClass: selectedClass, initialSubject: 'English')))),
+      SubjectTile(title: 'গণিত', subtitle: 'অনুশীলন ও সমাধান', icon: Icons.calculate_outlined, color: Color(0xFFFFF4E8), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ChapterLibraryPage(selectedClass: selectedClass, initialSubject: 'গণিত')))),
+      SubjectTile(title: 'বিজ্ঞান', subtitle: 'ধারণা ও আবিষ্কার', icon: Icons.science_outlined, color: Color(0xFFF4EEFF), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ChapterLibraryPage(selectedClass: selectedClass, initialSubject: 'বিজ্ঞান')))),
     ]),
     const SizedBox(height: 22),
     const Text('দ্রুত শুরু করো', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: ink)),
     const SizedBox(height: 12),
+    _quick(Icons.menu_book_rounded, 'অধ্যায়ভিত্তিক লেসন', 'লেসন পড়ো ও অধ্যায় শেষে MCQ দাও', () => Navigator.push(context, MaterialPageRoute(builder: (_) => ChapterLibraryPage(selectedClass: selectedClass)))),
     _quick(Icons.play_circle_outline, 'MCQ Quiz', 'নিজেকে যাচাই করো', () => setState(() => tab = 2)),
     _quick(Icons.note_alt_outlined, 'আমার নোটস', 'গুরুত্বপূর্ণ বিষয় গুছিয়ে রাখো', () => setState(() => tab = 3)),
   ]);
@@ -252,6 +253,194 @@ class _PracticePageState extends State<PracticePage> {
     ]),
   );
 }
+
+
+class ChapterUnit {
+  final String title, summary, lesson;
+  final List<QuizQuestion> questions;
+  const ChapterUnit(this.title, this.summary, this.lesson, this.questions);
+}
+
+const Map<String, List<ChapterUnit>> chapterLibrary = {
+  'বাংলা': [
+    ChapterUnit('গদ্য পাঠ ও অনুধাবন', 'মূলভাব, শব্দার্থ ও অনুধাবন', 'গদ্য পড়ার সময় প্রথমে অনুচ্ছেদের মূল বক্তব্য বোঝার চেষ্টা করবে। এরপর গুরুত্বপূর্ণ শব্দের অর্থ, লেখকের উদ্দেশ্য এবং অনুচ্ছেদ থেকে পাওয়া তথ্য নিজের ভাষায় লিখবে।\\n\\nঅনুশীলন: একটি অনুচ্ছেদ পড়ে ৩টি প্রশ্ন তৈরি করো—কে, কী, কেন।', [
+      QuizQuestion('গদ্যের মূলভাব বলতে কী বোঝায়?', ['লেখার প্রধান বক্তব্য', 'শুধু কঠিন শব্দ', 'লেখকের নাম', 'বইয়ের প্রচ্ছদ'], 0, 'মূলভাব হলো লেখার প্রধান বক্তব্য বা কেন্দ্রীয় ধারণা।'),
+      QuizQuestion('অনুধাবন যাচাইয়ের ভালো উপায় কোনটি?', ['না পড়ে উত্তর দেওয়া', 'নিজের ভাষায় বক্তব্য বলা', 'শুধু শিরোনাম মুখস্থ করা', 'সব শব্দ বাদ দেওয়া'], 1, 'নিজের ভাষায় বক্তব্য বলতে পারা অনুধাবনের লক্ষণ।'),
+    ]),
+    ChapterUnit('ব্যাকরণ: পদ পরিচয়', 'বিশেষ্য, সর্বনাম, বিশেষণ ও ক্রিয়া', 'বাক্যে ব্যবহৃত অর্থবোধক শব্দকে পদ বলা হয়। বিশেষ্য ব্যক্তি, বস্তু, স্থান বা ভাবের নাম বোঝায়। বিশেষ্যর পরিবর্তে ব্যবহৃত শব্দ সর্বনাম। বিশেষ্য বা সর্বনামের গুণ বোঝায় বিশেষণ। কাজ বা অবস্থা বোঝায় ক্রিয়া।', [
+      QuizQuestion('“রাহিম বই পড়ে”—এখানে “রাহিম” কোন পদ?', ['ক্রিয়া', 'বিশেষ্য', 'বিশেষণ', 'সর্বনাম'], 1, 'রাহিম একজন ব্যক্তির নাম, তাই এটি বিশেষ্য।'),
+      QuizQuestion('“সে” কোন পদ?', ['সর্বনাম', 'বিশেষ্য', 'ক্রিয়া', 'অব্যয়'], 0, 'বিশেষ্যের পরিবর্তে “সে” ব্যবহৃত হয়েছে, তাই সর্বনাম।'),
+    ]),
+  ],
+  'English': [
+    ChapterUnit('Parts of Speech', 'Noun, Pronoun, Verb and Adjective', 'Words have different jobs in a sentence. A noun names a person, place, animal or thing. A pronoun replaces a noun. A verb shows an action or state. An adjective describes a noun. Example: “Rina reads a beautiful book.” Rina and book are nouns, reads is a verb, and beautiful is an adjective.', [
+      QuizQuestion('Which word is a verb in “Birds fly”?', ['Birds', 'Fly', 'The', 'Beautiful'], 1, 'Fly shows an action, so it is a verb.'),
+      QuizQuestion('Which word is a pronoun?', ['Karim', 'School', 'They', 'Quickly'], 2, 'They is used instead of a noun, so it is a pronoun.'),
+    ]),
+    ChapterUnit('Tense: Present and Past', 'সময় অনুযায়ী verb-এর ব্যবহার', 'Tense tells us when an action happens. Simple present describes habits or facts: “I play football.” Simple past describes a completed past action: “I played football.” Some verbs are irregular: go becomes went.', [
+      QuizQuestion('Choose the simple past of “go”.', ['Goed', 'Going', 'Went', 'Goes'], 2, 'The simple past form of go is went.'),
+      QuizQuestion('“She reads every day” is in which tense?', ['Simple past', 'Simple present', 'Future', 'Present perfect'], 1, 'Reads describes a regular habit, so it is simple present.'),
+    ]),
+  ],
+  'গণিত': [
+    ChapterUnit('ভগ্নাংশ', 'লব, হর ও সমতুল ভগ্নাংশ', 'একটি সম্পূর্ণ বস্তুকে সমান কয়েকটি ভাগ করলে তার এক বা একাধিক ভাগকে ভগ্নাংশ দিয়ে প্রকাশ করা যায়। ভগ্নাংশে উপরের সংখ্যাটি লব এবং নিচের সংখ্যাটি হর। যেমন ৩/৪-এ লব ৩, হর ৪। লব ও হরকে একই শূন্য নয় এমন সংখ্যা দিয়ে গুণ করলে সমতুল ভগ্নাংশ পাওয়া যায়।', [
+      QuizQuestion('৩/৪ ভগ্নাংশে হর কত?', ['৩', '৪', '৭', '১২'], 1, 'ভগ্নাংশের নিচের সংখ্যাটি হর; এখানে ৪।'),
+      QuizQuestion('১/২-এর সমতুল ভগ্নাংশ কোনটি?', ['২/৩', '২/৪', '৩/৪', '১/৪'], 1, '১/২-এর লব ও হরকে ২ দিয়ে গুণ করলে ২/৪ হয়।'),
+    ]),
+    ChapterUnit('শতকরা', 'প্রতি একশতে হিসাব', 'শতকরা মানে প্রতি একশতে কত। কোনো সংখ্যার p% বের করতে সংখ্যাটিকে p দিয়ে গুণ করে ১০০ দিয়ে ভাগ করো। উদাহরণ: ২০০-এর ১০% = ২০০ × ১০ ÷ ১০০ = ২০।', [
+      QuizQuestion('১০০-এর ২৫% কত?', ['১০', '২০', '২৫', '৫০'], 2, '১০০ × ২৫ ÷ ১০০ = ২৫।'),
+      QuizQuestion('৮০-এর ৫০% কত?', ['২০', '৩০', '৪০', '৫০'], 2, '৫০% মানে অর্ধেক; ৮০-এর অর্ধেক ৪০।'),
+    ]),
+  ],
+  'বিজ্ঞান': [
+    ChapterUnit('উদ্ভিদের খাদ্য তৈরি', 'সালোকসংশ্লেষণ', 'সবুজ উদ্ভিদ সূর্যের আলো, পানি ও বাতাসের কার্বন ডাই-অক্সাইড ব্যবহার করে খাদ্য তৈরি করে। এই প্রক্রিয়ার নাম সালোকসংশ্লেষণ। পাতার ক্লোরোফিল সূর্যের আলো শোষণ করতে সাহায্য করে। এ সময় অক্সিজেনও নির্গত হয়।', [
+      QuizQuestion('উদ্ভিদ খাদ্য তৈরি করে কোন প্রক্রিয়ায়?', ['শ্বসন', 'সালোকসংশ্লেষণ', 'পরিপাক', 'বাষ্পীভবন'], 1, 'উদ্ভিদ সালোকসংশ্লেষণের মাধ্যমে খাদ্য তৈরি করে।'),
+      QuizQuestion('সালোকসংশ্লেষণে কোন গ্যাস ব্যবহৃত হয়?', ['অক্সিজেন', 'হাইড্রোজেন', 'কার্বন ডাই-অক্সাইড', 'নাইট্রোজেন'], 2, 'উদ্ভিদ বাতাস থেকে কার্বন ডাই-অক্সাইড গ্রহণ করে।'),
+    ]),
+    ChapterUnit('পদার্থের অবস্থা', 'কঠিন, তরল ও গ্যাস', 'পদার্থ সাধারণত কঠিন, তরল ও গ্যাসীয়—এই তিন অবস্থায় থাকতে পারে। কঠিনের নির্দিষ্ট আকার ও আয়তন থাকে। তরলের নির্দিষ্ট আয়তন থাকলেও পাত্রের আকার ধারণ করে। গ্যাস পাত্রের পুরো জায়গা দখল করে। পানি, বরফ ও জলীয় বাষ্প পরিচিত উদাহরণ।', [
+      QuizQuestion('বরফ পদার্থের কোন অবস্থা?', ['কঠিন', 'তরল', 'গ্যাস', 'প্লাজমা'], 0, 'বরফের নির্দিষ্ট আকার আছে, তাই এটি কঠিন।'),
+      QuizQuestion('জলীয় বাষ্প কোন অবস্থা?', ['কঠিন', 'তরল', 'গ্যাস', 'কোনোটিই নয়'], 2, 'জলীয় বাষ্প পানির গ্যাসীয় অবস্থা।'),
+    ]),
+  ],
+};
+
+class ChapterLibraryPage extends StatefulWidget {
+  final int selectedClass;
+  final String? initialSubject;
+  const ChapterLibraryPage({super.key, required this.selectedClass, this.initialSubject});
+  @override
+  State<ChapterLibraryPage> createState() => _ChapterLibraryPageState();
+}
+
+class _ChapterLibraryPageState extends State<ChapterLibraryPage> {
+  late int selectedClass;
+  late String subject;
+  @override
+  void initState() {
+    super.initState();
+    selectedClass = widget.selectedClass;
+    subject = widget.initialSubject ?? 'বাংলা';
+  }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: const Text('অধ্যায়ভিত্তিক লেসন', style: TextStyle(fontWeight: FontWeight.bold))),
+    body: ListView(padding: const EdgeInsets.all(18), children: [
+      Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF7660EA), Color(0xFF4E3CB8)]), borderRadius: BorderRadius.circular(18)), child: const Text('অধ্যায় বেছে নাও, লেসন পড়ো, তারপর MCQ দিয়ে নিজেকে যাচাই করো।', style: TextStyle(color: Colors.white, fontSize: 15, height: 1.5, fontWeight: FontWeight.w600))),
+      const SizedBox(height: 18),
+      const Text('শ্রেণি', style: TextStyle(fontWeight: FontWeight.bold)),
+      const SizedBox(height: 7),
+      DropdownButtonFormField<int>(
+        value: selectedClass,
+        decoration: const InputDecoration(filled: true, border: OutlineInputBorder()),
+        items: List.generate(5, (i) => i + 6).map((c) => DropdownMenuItem(value: c, child: Text('Class $c'))).toList(),
+        onChanged: (v) => setState(() => selectedClass = v ?? selectedClass),
+      ),
+      const SizedBox(height: 14),
+      const Text('বিষয়', style: TextStyle(fontWeight: FontWeight.bold)),
+      const SizedBox(height: 7),
+      DropdownButtonFormField<String>(
+        value: subject,
+        decoration: const InputDecoration(filled: true, border: OutlineInputBorder()),
+        items: chapterLibrary.keys.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
+        onChanged: (v) => setState(() => subject = v ?? subject),
+      ),
+      const SizedBox(height: 18),
+      Text('Class ' + selectedClass.toString() + ' • ' + subject, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: purple)),
+      const SizedBox(height: 10),
+      ...chapterLibrary[subject]!.asMap().entries.map((entry) {
+        final i = entry.key;
+        final unit = entry.value;
+        return Card(elevation: 0, color: Colors.white, margin: const EdgeInsets.only(bottom: 11), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)), child: ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+          leading: CircleAvatar(backgroundColor: pale, child: Text((i + 1).toString(), style: const TextStyle(color: purple, fontWeight: FontWeight.bold))),
+          title: Text(unit.title, style: const TextStyle(fontWeight: FontWeight.bold)),
+          subtitle: Text(unit.summary + '\\n' + unit.questions.length.toString() + 'টি MCQ • লেসন + কুইজ', style: const TextStyle(height: 1.5)),
+          isThreeLine: true,
+          trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ChapterDetailPage(classNumber: selectedClass, subject: subject, unit: unit))),
+        ));
+      }),
+      const SizedBox(height: 8),
+      const Text('নোট: এগুলো প্রাথমিক নমুনা লেসন। নির্দিষ্ট NCTB শ্রেণি/সংস্করণের হুবহু অধ্যায় নয়।', style: TextStyle(fontSize: 11, color: Colors.black54, height: 1.5)),
+    ]),
+  );
+}
+
+class ChapterDetailPage extends StatefulWidget {
+  final int classNumber;
+  final String subject;
+  final ChapterUnit unit;
+  const ChapterDetailPage({super.key, required this.classNumber, required this.subject, required this.unit});
+  @override
+  State<ChapterDetailPage> createState() => _ChapterDetailPageState();
+}
+
+class _ChapterDetailPageState extends State<ChapterDetailPage> {
+  int index = 0, score = 0;
+  int? selected;
+  bool completed = false;
+  QuizQuestion get question => widget.unit.questions[index];
+
+  void next() {
+    if (selected == null) return;
+    setState(() {
+      if (selected == question.answer) score++;
+      if (index == widget.unit.questions.length - 1) {
+        completed = true;
+      } else {
+        index++;
+        selected = null;
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: Text(widget.unit.title, style: const TextStyle(fontWeight: FontWeight.bold))),
+    body: ListView(padding: const EdgeInsets.all(18), children: [
+      Text('Class ' + widget.classNumber.toString() + ' • ' + widget.subject, style: const TextStyle(color: purple, fontWeight: FontWeight.bold)),
+      const SizedBox(height: 12),
+      Container(padding: const EdgeInsets.all(18), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const Text('📘 লেসন', style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: ink)),
+        const SizedBox(height: 12),
+        Text(widget.unit.lesson, style: const TextStyle(fontSize: 16, height: 1.8, color: ink)),
+      ])),
+      const SizedBox(height: 18),
+      const Text('📝 অধ্যায়ের MCQ', style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: ink)),
+      const SizedBox(height: 10),
+      if (completed) Container(padding: const EdgeInsets.all(22), decoration: BoxDecoration(color: pale, borderRadius: BorderRadius.circular(18)), child: Column(children: [
+        const Icon(Icons.emoji_events_rounded, size: 52, color: Color(0xFFE6A23C)),
+        const SizedBox(height: 8),
+        const Text('কুইজ শেষ!', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+        Text('তোমার স্কোর: ' + score.toString() + ' / ' + widget.unit.questions.length.toString(), style: const TextStyle(fontSize: 19, color: purple, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 12),
+        FilledButton.icon(onPressed: () => setState(() { index = 0; score = 0; selected = null; completed = false; }), icon: const Icon(Icons.refresh), label: const Text('আবার দাও')),
+      ])) else ...[
+        Text('প্রশ্ন ' + (index + 1).toString() + ' / ' + widget.unit.questions.length.toString(), style: const TextStyle(fontWeight: FontWeight.bold, color: purple)),
+        const SizedBox(height: 8),
+        Text(question.question, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, height: 1.5)),
+        const SizedBox(height: 10),
+        ...List.generate(question.options.length, (i) {
+          final answered = selected != null;
+          final correct = i == question.answer;
+          return Container(margin: const EdgeInsets.only(bottom: 8), child: ListTile(
+            tileColor: answered && correct ? const Color(0xFFE7F7EC) : selected == i ? const Color(0xFFFFEEEE) : Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(13), side: BorderSide(color: answered && correct ? Colors.green : selected == i ? Colors.red : Colors.black12)),
+            title: Text(question.options[i]),
+            leading: CircleAvatar(radius: 14, backgroundColor: pale, child: Text(String.fromCharCode(65 + i), style: const TextStyle(color: purple))),
+            trailing: answered && correct ? const Icon(Icons.check_circle, color: Colors.green) : null,
+            onTap: answered ? null : () => setState(() => selected = i),
+          ));
+        }),
+        if (selected != null) Container(padding: const EdgeInsets.all(13), decoration: BoxDecoration(color: pale, borderRadius: BorderRadius.circular(13)), child: Text((selected == question.answer ? 'সঠিক উত্তর! ' : 'সঠিক উত্তর: ' + question.options[question.answer] + '. ') + question.explanation, style: const TextStyle(height: 1.5))),
+        const SizedBox(height: 10),
+        SizedBox(height: 48, child: FilledButton(onPressed: selected == null ? null : next, child: Text(index == widget.unit.questions.length - 1 ? 'ফলাফল দেখো' : 'পরের প্রশ্ন'))),
+      ],
+    ]),
+  );
+}
+
 
 class SimplePage extends StatelessWidget {
   final String title, subtitle; final IconData icon;
