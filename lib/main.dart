@@ -381,8 +381,47 @@ class ChapterDetailPage extends StatefulWidget {
 class _ChapterDetailPageState extends State<ChapterDetailPage> {
   int index = 0, score = 0;
   int? selected;
-  bool completed = false;
+  bool completed = false, speaking = false;
+  final FlutterTts lessonTts = FlutterTts();
   QuizQuestion get question => widget.unit.questions[index];
+
+  @override
+  void initState() {
+    super.initState();
+    _prepareLessonVoice();
+  }
+
+  Future<void> _prepareLessonVoice() async {
+    try {
+      await lessonTts.setLanguage(widget.subject == 'English' ? 'en-US' : 'bn-BD');
+      await lessonTts.setSpeechRate(0.44);
+      lessonTts.setCompletionHandler(() {
+        if (mounted) setState(() => speaking = false);
+      });
+    } catch (_) {}
+  }
+
+  Future<void> _toggleLessonVoice() async {
+    try {
+      if (speaking) {
+        await lessonTts.stop();
+        if (mounted) setState(() => speaking = false);
+      } else {
+        await lessonTts.stop();
+        if (mounted) setState(() => speaking = true);
+        await lessonTts.speak(widget.unit.title + '. ' + widget.unit.lesson);
+      }
+    } catch (_) {
+      if (mounted) setState(() => speaking = false);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('এই ডিভাইসে ভয়েস চালানো যাচ্ছে না।')));
+    }
+  }
+
+  @override
+  void dispose() {
+    lessonTts.stop();
+    super.dispose();
+  }
 
   void next() {
     if (selected == null) return;
@@ -405,7 +444,14 @@ class _ChapterDetailPageState extends State<ChapterDetailPage> {
       Text('Class ' + widget.classNumber.toString() + ' • ' + widget.subject, style: const TextStyle(color: purple, fontWeight: FontWeight.bold)),
       const SizedBox(height: 12),
       Container(padding: const EdgeInsets.all(18), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('📘 লেসন', style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: ink)),
+        Row(children: [
+          const Expanded(child: Text('📘 লেসন', style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: ink))),
+          IconButton.filledTonal(
+            onPressed: _toggleLessonVoice,
+            tooltip: speaking ? 'পড়া বন্ধ করো' : 'লেসন শুনো',
+            icon: Icon(speaking ? Icons.stop_rounded : Icons.volume_up_rounded),
+          ),
+        ]),
         const SizedBox(height: 12),
         Text(widget.unit.lesson, style: const TextStyle(fontSize: 16, height: 1.8, color: ink)),
       ])),
