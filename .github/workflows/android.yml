@@ -33,6 +33,14 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      - name: Generate StudyMate launcher icon
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick
+          mkdir -p assets/icon
+          convert -background none assets/icon/app_icon.svg -resize 1024x1024 assets/icon/app_icon.png
+          dart run flutter_launcher_icons
+
       - name: Build release APK
         run: flutter build apk --release --build-number=${{ github.run_number }}
 
