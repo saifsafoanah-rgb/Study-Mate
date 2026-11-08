@@ -293,7 +293,11 @@ class BuddiesPage extends StatelessWidget {
         leading: GuideAvatar(guide: g, size: 62),
         title: Text('${g.name} • ${g.subject}', style: const TextStyle(fontWeight: FontWeight.bold)),
         subtitle: Text(g.intro),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+        trailing: IconButton(
+          tooltip: 'Voice lesson',
+          icon: const Icon(Icons.play_circle_fill_rounded, color: purple, size: 30),
+          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => VoiceLessonPage(guide: g))),
+        ),
         onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => GuideChatPage(guide: g))),
       ))),
       const Padding(padding: EdgeInsets.only(top: 4), child: Text('নোট: ভয়েস ফিচার ফোনের Speech ও Text-to-Speech সুবিধা ব্যবহার করে।', style: TextStyle(color: Colors.black54, fontSize: 11))),
@@ -397,6 +401,155 @@ class _GuideChatPageState extends State<GuideChatPage> {
         const SizedBox(width: 8),
         IconButton.filled(onPressed: () => _send(), icon: const Icon(Icons.send_rounded)),
       ]))),
+    ]),
+  );
+}
+
+
+class VoiceLessonPage extends StatefulWidget {
+  final StudyGuide guide;
+  const VoiceLessonPage({super.key, required this.guide});
+  @override
+  State<VoiceLessonPage> createState() => _VoiceLessonPageState();
+}
+
+class _VoiceLessonPageState extends State<VoiceLessonPage> {
+  final FlutterTts tts = FlutterTts();
+  final stt.SpeechToText speech = stt.SpeechToText();
+  int lessonIndex = 0;
+  bool speaking = false;
+  bool listening = false;
+  bool speechReady = false;
+  String heard = '';
+
+  List<Map<String, String>> get lessons {
+    switch (widget.guide.subject) {
+      case 'গণিত':
+        return [
+          {'title': 'গুণের সহজ ধারণা', 'body': 'গুণ হলো একই সংখ্যাকে বারবার যোগ করার সংক্ষিপ্ত পদ্ধতি। যেমন, ৩ গুণ ৪ মানে ৩ চারবার যোগ: ৩ যোগ ৩ যোগ ৩ যোগ ৩, যার ফল ১২।'},
+          {'title': 'ভগ্নাংশ পরিচিতি', 'body': 'ভগ্নাংশ কোনো সম্পূর্ণ বস্তুর সমান অংশের এক বা একাধিক অংশ বোঝায়। উপরের সংখ্যাকে লব এবং নিচের সংখ্যাকে হর বলে।'},
+          {'title': 'শতকরা', 'body': 'শতকরা মানে প্রতি একশতে কত। ৫০ শতাংশ মানে একশ ভাগের পঞ্চাশ ভাগ, অর্থাৎ অর্ধেক।'},
+        ];
+      case 'English':
+        return [
+          {'title': 'Noun', 'body': 'A noun is the name of a person, place, animal, or thing. Examples are Rina, Dhaka, cat, and book. Repeat: A noun names something.'},
+          {'title': 'Verb', 'body': 'A verb expresses an action or a state. Examples are read, play, write, and is. In the sentence I read a book, read is the verb.'},
+          {'title': 'Adjective', 'body': 'An adjective describes a noun. Examples are a beautiful flower, a tall tree, and a kind person.'},
+        ];
+      case 'বিজ্ঞান':
+        return [
+          {'title': 'সালোকসংশ্লেষণ', 'body': 'সবুজ উদ্ভিদ সূর্যের আলো, পানি ও কার্বন ডাই অক্সাইড ব্যবহার করে নিজের খাদ্য তৈরি করে। এই প্রক্রিয়াকে সালোকসংশ্লেষণ বলে।'},
+          {'title': 'পানির অবস্থা', 'body': 'পানি কঠিন, তরল ও গ্যাসীয়—এই তিন অবস্থায় থাকতে পারে। বরফ হলো কঠিন, সাধারণ পানি তরল, আর জলীয় বাষ্প গ্যাসীয় অবস্থা।'},
+          {'title': 'বল', 'body': 'কোনো বস্তুকে ধাক্কা দেওয়া বা টানাকে বল বলে। বল বস্তুর গতি, দিক বা আকৃতি পরিবর্তন করতে পারে।'},
+        ];
+      default:
+        return [
+          {'title': 'ভালোভাবে পড়ার কৌশল', 'body': 'একবারে অল্প পড়ো, নিজের ভাষায় বোঝানোর চেষ্টা করো, তারপর বই বন্ধ করে মনে করার অনুশীলন করো। নিয়মিত ছোট বিরতি নিলে মনোযোগ ধরে রাখা সহজ হয়।'},
+          {'title': 'নতুন শব্দ শেখা', 'body': 'প্রতিদিন কয়েকটি নতুন শব্দ শেখো। শব্দের অর্থ, একটি বাক্য এবং উচ্চারণ একসঙ্গে অনুশীলন করো।'},
+          {'title': 'পুনরাবৃত্তি', 'body': 'আজ যা শিখেছ, দিনের শেষে একবার ঝালিয়ে নাও। পরের দিন আবার মনে করার চেষ্টা করো। এতে শেখা দীর্ঘস্থায়ী হয়।'},
+        ];
+    }
+  }
+
+  Map<String, String> get current => lessons[lessonIndex];
+
+  @override
+  void initState() {
+    super.initState();
+    _prepareVoice();
+  }
+
+  Future<void> _prepareVoice() async {
+    try {
+      speechReady = await speech.initialize();
+      await tts.setLanguage(widget.guide.subject == 'English' ? 'en-US' : 'bn-BD');
+      await tts.setSpeechRate(0.43);
+      tts.setCompletionHandler(() {
+        if (mounted) setState(() => speaking = false);
+      });
+      if (mounted) setState(() {});
+    } catch (_) {}
+  }
+
+  Future<void> _play() async {
+    try {
+      await tts.stop();
+      setState(() => speaking = true);
+      await tts.speak('${current['title']}. ${current['body']}');
+    } catch (_) {
+      if (mounted) setState(() => speaking = false);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('এই ব্রাউজারে ভয়েস চালু করা যায়নি।')));
+    }
+  }
+
+  Future<void> _stop() async {
+    await tts.stop();
+    if (mounted) setState(() => speaking = false);
+  }
+
+  Future<void> _listen() async {
+    if (!speechReady) await _prepareVoice();
+    if (!speechReady) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('মাইক্রোফোন বা Speech Recognition অনুমতি পাওয়া যায়নি।')));
+      return;
+    }
+    if (listening) {
+      await speech.stop();
+      if (mounted) setState(() => listening = false);
+      return;
+    }
+    setState(() { listening = true; heard = ''; });
+    await speech.listen(
+      localeId: widget.guide.subject == 'English' ? 'en_US' : 'bn_BD',
+      onResult: (result) {
+        if (!mounted) return;
+        setState(() {
+          heard = result.recognizedWords;
+          if (result.finalResult) listening = false;
+        });
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    tts.stop();
+    speech.stop();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: const Text('ভয়েস লেসন', style: TextStyle(fontWeight: FontWeight.bold))),
+    body: ListView(padding: const EdgeInsets.all(20), children: [
+      Center(child: GuideAvatar(guide: widget.guide, size: 112)),
+      const SizedBox(height: 12),
+      Center(child: Text('${widget.guide.name} • ${widget.guide.subject}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: ink))),
+      const SizedBox(height: 5),
+      const Center(child: Text('শোনো, বোঝো, তারপর নিজে বলো', style: TextStyle(color: Colors.black54))),
+      const SizedBox(height: 22),
+      LinearProgressIndicator(value: (lessonIndex + 1) / lessons.length, color: purple, backgroundColor: pale, minHeight: 7),
+      const SizedBox(height: 9),
+      Text('লেসন ${lessonIndex + 1} / ${lessons.length}', style: const TextStyle(color: purple, fontWeight: FontWeight.bold)),
+      const SizedBox(height: 12),
+      Container(padding: const EdgeInsets.all(20), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(current['title']!, style: const TextStyle(fontSize: 21, fontWeight: FontWeight.bold, color: ink)),
+        const SizedBox(height: 12),
+        Text(current['body']!, style: const TextStyle(fontSize: 17, height: 1.7, color: ink)),
+      ])),
+      const SizedBox(height: 16),
+      FilledButton.icon(onPressed: speaking ? _stop : _play, icon: Icon(speaking ? Icons.stop_circle_outlined : Icons.volume_up_rounded), label: Text(speaking ? 'শোনা বন্ধ করো' : 'গাইডের কথা শোনো')),
+      const SizedBox(height: 10),
+      OutlinedButton.icon(onPressed: _listen, icon: Icon(listening ? Icons.stop : Icons.mic), label: Text(listening ? 'শোনা হচ্ছে… থামাও' : 'এবার নিজে বলে দেখো')),
+      if (heard.isNotEmpty) Container(margin: const EdgeInsets.only(top: 12), padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: pale, borderRadius: BorderRadius.circular(14)), child: Text('তুমি বলেছ: $heard')),
+      const SizedBox(height: 18),
+      Row(children: [
+        Expanded(child: OutlinedButton(onPressed: lessonIndex == 0 ? null : () { setState(() { lessonIndex--; heard = ''; }); _stop(); }, child: const Text('আগের লেসন'))),
+        const SizedBox(width: 10),
+        Expanded(child: FilledButton(onPressed: lessonIndex == lessons.length - 1 ? null : () { setState(() { lessonIndex++; heard = ''; }); _stop(); }, child: const Text('পরের লেসন'))),
+      ]),
+      const SizedBox(height: 12),
+      const Text('এগুলো নমুনা অনুশীলনী লেসন; নির্দিষ্ট NCTB বইয়ের অধ্যায়ের হুবহু পাঠ নয়। ভয়েস কাজ করতে ব্রাউজারের মাইক্রোফোন অনুমতি লাগতে পারে।', style: TextStyle(fontSize: 11, color: Colors.black54, height: 1.5)),
     ]),
   );
 }
