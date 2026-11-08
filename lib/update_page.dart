@@ -47,7 +47,7 @@ class _UpdatePageState extends State<UpdatePage> {
         final asset = item as Map<String, dynamic>;
         if (asset['name'] == 'app-release.apk.sha256' && asset['browser_download_url'] != null) {
           final hashResponse = await http.get(Uri.parse(asset['browser_download_url'].toString())).timeout(const Duration(seconds: 15));
-          if (hashResponse.statusCode == 200) hash = hashResponse.body.trim().split(RegExp(r'\\s+')).first;
+          if (hashResponse.statusCode == 200) hash = hashResponse.body.trim().split(RegExp(r'\s+')).first;
         }
       }
       if (!mounted) return;
