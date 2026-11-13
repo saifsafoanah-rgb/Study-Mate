@@ -37,7 +37,7 @@ jobs:
           from pathlib import Path
           p = Path("android/app/build.gradle.kts")
           s = p.read_text()
-          s = s.replace("android {", "android {\\n    lint { checkReleaseBuilds = false }", 1)
+          s = s.replace("android {", "android {" + chr(10) + "    lint { checkReleaseBuilds = false }", 1)
           p.write_text(s)
           PY
           elif [ -f android/app/build.gradle ]; then
@@ -45,7 +45,7 @@ jobs:
           from pathlib import Path
           p = Path("android/app/build.gradle")
           s = p.read_text()
-          s = s.replace("android {", "android {\\n    lint { checkReleaseBuilds false }", 1)
+          s = s.replace("android {", "android {" + chr(10) + "    lint { checkReleaseBuilds false }", 1)
           p.write_text(s)
           PY
           fi
