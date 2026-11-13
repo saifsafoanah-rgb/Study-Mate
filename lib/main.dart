@@ -49,6 +49,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int selectedClass = 8;
   int tab = 0;
+  String selectedStream = 'সাধারণ মাধ্যমিক';
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -80,8 +81,15 @@ class _HomePageState extends State<HomePage> {
     Text('তোমার শ্রেণি নির্বাচন করো', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
     const SizedBox(height: 12),
     Wrap(spacing: 9, runSpacing: 9, children: List.generate(5, (i) { final c = i + 6; final active = selectedClass == c; return ChoiceChip(label: Text('Class $c'), selected: active, onSelected: (_) => setState(() => selectedClass = c), selectedColor: pale, labelStyle: TextStyle(color: active ? purple : Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w700), side: BorderSide(color: active ? purple : Colors.black12)); })),
+    const SizedBox(height: 20),
+    Text('শিক্ষাধারা নির্বাচন করো', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
+    const SizedBox(height: 10),
+    Wrap(spacing: 9, runSpacing: 9, children: [
+      ChoiceChip(label: const Text('সাধারণ মাধ্যমিক'), selected: selectedStream == 'সাধারণ মাধ্যমিক', onSelected: (_) => setState(() => selectedStream = 'সাধারণ মাধ্যমিক'), selectedColor: pale),
+      ChoiceChip(label: const Text('দাখিল মাদ্রাসা'), selected: selectedStream == 'দাখিল মাদ্রাসা', onSelected: (_) => setState(() => selectedStream = 'দাখিল মাদ্রাসা'), selectedColor: pale),
+    ]),
     const SizedBox(height: 25),
-    Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('বিষয়সমূহ', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)), Text('Class $selectedClass', style: const TextStyle(color: purple, fontWeight: FontWeight.w700))]),
+    Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('বিষয়সমূহ', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)), Text('$selectedStream • Class $selectedClass', style: const TextStyle(color: purple, fontWeight: FontWeight.w700))]),
     const SizedBox(height: 12),
     GridView.count(crossAxisCount: 2, shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), mainAxisSpacing: 12, crossAxisSpacing: 12, childAspectRatio: 1.65, children: [
       SubjectTile(title: 'বাংলা', subtitle: 'ভাষা ও সাহিত্য', icon: Icons.translate, color: Color(0xFFEFF7F1), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ChapterLibraryPage(selectedClass: selectedClass, initialSubject: 'বাংলা')))),
